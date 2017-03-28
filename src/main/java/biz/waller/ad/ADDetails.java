@@ -81,8 +81,6 @@ public class ADDetails {
             ldapEnv.put(Context.SECURITY_PROTOCOL, "ssl");
             ldapEnv.put("com.sun.jndi.ldap.connect.pool", "true");
             ldapEnv.put("com.sun.jndi.ldap.connect.pool.protocol", "plain ssl");
-            //ldapEnv.put("ldap.connection.com.sun.jndi.ldap.read.timeout", "500");
-            //ldapEnv.put(Context.SECURITY_PROTOCOL, "simple");
             System.out.println(System.currentTimeMillis() + " <- Pre LDAP Context creation");
             LdapContext ldapContext = new InitialLdapContext(ldapEnv, null);
             System.out.println(System.currentTimeMillis() + " <- Post LDAP Context creation");
@@ -152,12 +150,10 @@ public class ADDetails {
                     System.out.println(unprocessedGroupDN);
 
                     groupList.add(unprocessedGroupDN);
-                    //String unprocessedGroupCN = getCN(unprocessedGroupDN);
                 }
             }
 
         }
-        //groupList = testJava8Stream(groupList);
         groupList = groupList.stream().distinct().collect(Collectors.toList());
         System.out.println("Entering distinct list...");
         for (int i = 0; i < groupList.size(); i++) {
@@ -199,7 +195,6 @@ public class ADDetails {
 
                 totalResults++;
                 String dn = sr.getName() + ", " + searchBase;
-                //System.out.println(">>>" + sr.getName());
 
                 Attributes searchAtt = cnx.getAttributes(dn, returnedAtts);
                 Attributes attrs = sr.getAttributes();
@@ -296,7 +291,6 @@ public class ADDetails {
 
                 totalResults++;
                 String dn = sr.getName() + ", " + searchBase;
-                //System.out.println(">>>" + sr.getName());
 
                 Attributes searchAtt = cnx.getAttributes(dn, returnedAtts);
                 Attributes attrs = sr.getAttributes();
@@ -322,7 +316,6 @@ public class ADDetails {
             String fullDN = getDN(samAccountName);
             LdapContext cnx = getADConnection();
 
-            //cnx.modifyAttributes(fullDN, mods);
             System.out.println(System.currentTimeMillis() + " <- Pre Create Attribute");
             BasicAttribute attr = new BasicAttribute("UnicodePwd", createUnicodePassword(password));
             System.out.println(System.currentTimeMillis() + " <- Pre Make modification item");
