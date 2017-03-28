@@ -1,9 +1,25 @@
 <%--
-  Created by IntelliJ IDEA.
-  User: Raphael
-  Date: 07/03/2017
-  Time: 18:13
-  To change this template use File | Settings | File Templates.
+MIT License
+
+Copyright (c) 2017 Raphael Waller
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
@@ -16,15 +32,7 @@
             var groupdata = $("#grouptable input:checked").map(function (i, el) {
                 return el.value;
             }).get();
-            /*
-             //var groupdata = $("#groupID").val();
-             var groupdata = new Array();
-             $('#groupID > option').each(
-             function(i){
-             alert($(this).val());
-             groupdata[i] = $(this).val();
-             }); */
-            //var groupdata = ["Var 1", "Var 2"];
+
             var fName = $("#fNameField").val();
             var sName = $("#sNameField").val();
             var descr = $("#descrField").val();
@@ -62,22 +70,7 @@
             $("<option>").val(selectedValue).text(selectedText).appendTo($select); // Create HTML <option> element, set its value with currently iterated key and its text content with currently iterated item and finally append it to the <select>.
         });
 
-/*            $(document).on("change", "#selectedUsers", function () { // When HTML DOM "dblclick" event is invoked on element with ID "somebutton", execute the following function...
-                var samnames = new Array();
-                $('#selectedUsers > option').each(
-                    function(i){
-                        samnames[i] = $(this).val();
-                    });
-                $.get("groupList", {grouplist: samnames}, function (responseJson) {   // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response text...
-                    var $select = $("#adgroups");                           // Locate HTML DOM element with ID "someselect".
-                    $select.find("option").remove();                          // Find all child elements with tag fieldname "option" and remove them (just to prevent duplicate options when button is pressed again).
-                    $.each(responseJson, function (key, value) {               // Iterate over the JSON object.
-                        $("<option>").val(key).text(value).appendTo($select); // Create HTML <option> element, set its value with currently iterated key and its text content with currently iterated item and finally append it to the <select>.
-                    });
-                });
 
-            });
-*/
             $(document).on("click", "#tablebutton", function() {        // When HTML DOM "click" event is invoked on element with ID "somebutton", execute the following function...
                 var samnames = new Array();
                 $('#selectedUsers > option').each(
