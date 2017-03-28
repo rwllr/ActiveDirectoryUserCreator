@@ -12,6 +12,7 @@
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script>
         $(document).on("click", "#createbutton", function (e) {
+            $("#statusMessage").empty().append("Please wait. Creating user can take up to 30 seconds.");
             var groupdata = $("#grouptable input:checked").map(function (i, el) {
                 return el.value;
             }).get();
@@ -31,21 +32,13 @@
             $.get("createUser", {data: JSON.stringify({groupID: groupdata, fName: fName, sName: sName, descr: descr})},
                 function (responseData) {
                     $("#statusMessage").empty().append("Username: "+responseData.samAccountName +
-                        "<br/>Password :" + responseData.password)
+                        "<br/>Password :" + responseData.password +
+                        "<br/>A ticket has been created and you will receive confirmation once this account has been enabled")
 
                 })
                 .fail( function (xhr) {
                     $("#statusMessage").empty().append(xhr.responseText);
             });
-            /* ,
-             success: function (responseJson) {          // Execute Ajax GET request on URL of "someservlet" and execute the following function with Ajax response JSON...
-             //var $table = $('<table id="StatusTable" border="1">').appendTo($("#grouptable").empty()); // Create HTML <table> element and append it to HTML DOM element with ID "somediv".
-             $.each(responseJson, function(index, StatusResponse) {    // Iterate over the JSON array.
-             $("<tr><td>").text(StatusResponse.samAccountName).appendTo('#statusMessage')                     // Create HTML <tr> element, set its text content with currently iterated item and append it to the <table>.
-             .append($("<br/>").text(StatusResponse.password))      // Create HTML <td> element, set its text content with name of currently iterated group and append it to the <tr>.
-             }); //TODO fix the response handling here and see how to handle the different types of response
-             }
-             } */
         });
 
 
