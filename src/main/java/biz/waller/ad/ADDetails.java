@@ -1,7 +1,6 @@
 package biz.waller.ad;
 
 import javax.naming.Context;
-import javax.naming.NameAlreadyBoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
@@ -26,7 +25,7 @@ public class ADDetails {
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         String searchFilter = "samaccountname=" + samAccountName;
         //Specify the Base for the search
-        String searchBase = "DC=internal,DC=waller,DC=biz";
+        String searchBase = ADPropLoader.searchBase;
         NamingEnumeration<SearchResult> answer = cnx.search(searchBase, searchFilter, searchCtls);
         cnx.close();
         return answer.next().getNameInNamespace();
@@ -117,8 +116,6 @@ public class ADDetails {
         searchCtls.setReturningAttributes(attributes);
         NamingEnumeration<?> answer = ldapContext.search(searchBase, "(&(objectclass=user)(|"+ samquerystring + "))", searchCtls);
 
-
-        //NamingEnumeration<SearchResult> answer = ldapContext.search(searchBase, searchFilter, searchCtls);
         //Loop through the search results
         while (answer.hasMoreElements()) {
             SearchResult sr = (SearchResult) answer.next();
@@ -298,21 +295,7 @@ public class ADDetails {
 
         try
         {
-            System.out.println("updating password...\n");
-            String quotedPassword = "\"" + password + "\"";
-            char unicodePwd[] = quotedPassword.toCharArray();
-            byte pwdArray[] = new byte[unicodePwd.length * 2];
-            for (int i = 0; i < unicodePwd.length; i++)
-            {
-                pwdArray[i * 2 + 1] = (byte) (unicodePwd[i] >>> 8);
-                pwdArray[i * 2 + 0] = (byte) (unicodePwd[i] & 0xff);
-            }
-            System.out.print("encoded password: ");
-            for (int i = 0; i < pwdArray.length; i++)
-            {
-                System.out.print(pwdArray[i] + " ");
-            }
-            System.out.println();
+
             ModificationItem[] mods = new ModificationItem[1];
 
             mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("employeeNumber","18"));
@@ -321,7 +304,7 @@ public class ADDetails {
 
             //cnx.modifyAttributes(fullDN, mods);
             System.out.println(System.currentTimeMillis() + " <- Pre Create Attribute");
-            BasicAttribute attr = new BasicAttribute("UnicodePwd", pwdArray);
+            BasicAttribute attr = new BasicAttribute("UnicodePwd", createUnicodePassword(password));
             System.out.println(System.currentTimeMillis() + " <- Pre Make modification item");
             mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, attr);
             System.out.println(System.currentTimeMillis() + " <- Pre Modify Context (Password)");
@@ -337,10 +320,15 @@ public class ADDetails {
             return false;
         }
     }
-    public static Boolean createUser(ADUser newUser) {
+    public static Map<String, String> createUser(ADUser newUser) throws NamingException {
         String userName = newUser.getfName()  + "."  + newUser.getsName(); //TODO Add . or create naming scheme
         String userCN = newUser.getfName() + " " + newUser.getsName();
-        String userDN = "CN=" + userCN + "," + ADPropLoader.defaultUserOU; //TODO remove hard coded full DN - done?
+        String userDN = "CN=" + userCN + "," + ADPropLoader.defaultUserOU;
+        String newPassword = ADPassword.generate();
+
+        Map<String, String> returnedDetails = new HashMap();
+        returnedDetails.put("samAccountName", userName);
+        returnedDetails.put("password", newPassword);
 
         Attributes container = new BasicAttributes();
 
@@ -358,8 +346,8 @@ public class ADDetails {
         Attribute givenName = new BasicAttribute("givenName", newUser.getfName());
         Attribute sn = new BasicAttribute("sn", newUser.getsName());
         Attribute uid = new BasicAttribute("uid", userName);
-        Attribute password = new BasicAttribute("unicodePwd", createUnicodePassword("helloWorld!")); //TODO Set read password from form
-        // Attribute logonscript = new BasicAttribute("scriptPath", "logon.bat"); //TODO work out where to get script from
+        Attribute password = new BasicAttribute("unicodePwd", createUnicodePassword(newPassword));
+        Attribute logonscript = new BasicAttribute("scriptPath", "logon.bat"); //TODO work out where to get script from
 
         container.put(objClasses);
         container.put(sAMAccountName);
@@ -369,86 +357,32 @@ public class ADDetails {
         container.put(givenName);
         container.put(uid);
         container.put(password);
-        //container.put(logonscript); //Not implemented yet
+        //container.put(logonscript); //TODO Login script not implemented yet
 
-        try {
             LdapContext cnx = getADConnection();
-            cnx.createSubcontext(userDN, container); //TODO figure out hard coded ou and suffix
-            //TODO figure out login script
+            cnx.createSubcontext(userDN, container);
 
             String[] groupArray = newUser.getGroups(); // Get the array of group DN's from the JSon
-            System.out.println(groupArray[0]);
             ModificationItem mod[] = new ModificationItem[1];
             mod[0] = new ModificationItem(DirContext.ADD_ATTRIBUTE,
                     new BasicAttribute("member", userDN)); // Prepare an attribute for adding to a group
-            for (int i=0; i<groupArray.length; i++) {
-                cnx.modifyAttributes(groupArray[i], mod); // Add to group!
-                System.out.println("Adding to the group: " + groupArray[i]);
+            for (String item: groupArray) {
+                cnx.modifyAttributes(item, mod); // Add to group!
+                System.out.println("Adding to the group: " + item);
             }
-            return true;
-        } catch (NameAlreadyBoundException e){
-            System.out.println("Account already exists with this username"); //TODO throw the exception back to the web UI
+            return returnedDetails;
 
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+    }
+    public static void enableUser(String samAccountName) throws NamingException {
+        String dn = getDN(samAccountName);
+        System.out.println(dn);
 
-    return true;
+        LdapContext ctx = getADConnection();
+
+        int userAccountControlOrig = Integer.parseInt(ctx.getAttributes(dn).get("userAccountControl").get().toString());
+        int userAccountControlValue = userAccountControlOrig & ~0x2; // Add UF_ACCOUNTDISABLE bits
+        ModificationItem[] mods = new ModificationItem[1];
+        mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userAccountControl",""+userAccountControlValue));
+        ctx.modifyAttributes(dn, mods);
     }
 }
-
-
-/*
-    // Create the search controls
-    SearchControls searchCtls = new SearchControls();
-
-    //Specify the attributes to return
-    String returnedAtts[]={"mail", "displayName", "description", "samAccountName"};
-                searchCtls.setReturningAttributes(returnedAtts);
-                        //Specify the search scope
-                        searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-                        //specify the LDAP search filter
-                        String searchFilter = "(&(objectClass=group))";
-                        //Specify the Base for the search
-                        String searchBase = "DC=internal,DC=waller,DC=biz";
-                        //initialize counter to total the results
-                        int totalResults = 0;
-
-                        // Search for objects using the filter
-                        NamingEnumeration<SearchResult> answer = ldapContext.search(searchBase, searchFilter, searchCtls);
-
-        //Loop through the search results
-        while (answer.hasMoreElements())
-        {
-        SearchResult sr = (SearchResult)answer.next();
-
-        totalResults++;
-        String dn = sr.getName() + ", " + searchBase;
-        //System.out.println(">>>" + sr.getName());
-
-        Attributes searchAtt = ldapContext.getAttributes(dn, returnedAtts);
-
-        Attributes attrs = sr.getAttributes();
-        System.out.println(attrs.get("samaccountname"));
-        if (attrs.get("description") != null) {
-        System.out.println(attrs.get("description")); }
-        //System.out.println(sr.getAttributes());
-        //Attribute attrs2 = searchAtt.get(returnedAtts[0]);
-        //System.out.println(attrs2.get());
-        }
-
-
-
-
-        System.out.println("Total results: " + totalResults);
-        ldapContext.close();
-        }
-        catch (Exception e)
-        {
-        System.out.println(" Search error: " + e);
-        e.printStackTrace();
-        System.exit(-1);
-
-*/

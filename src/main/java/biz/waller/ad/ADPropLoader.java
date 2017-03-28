@@ -2,7 +2,6 @@ package biz.waller.ad;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -18,6 +17,7 @@ public class ADPropLoader
     static String searchBase;
     static String defaultUserOU;
     static String domainSuffix;
+    static String encryptionKey;
     static {
         try {
             Properties prop = new Properties();
@@ -31,18 +31,19 @@ public class ADPropLoader
                 throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
             }
 
-            Date time = new Date(System.currentTimeMillis());
-
             // get the property value and print it out
-            String user = prop.getProperty("user");
             adminUsername = prop.getProperty("adminUsername");
             adminPassword = prop.getProperty("adminPassword");
             baseOU = prop.getProperty("baseOU");
             ldapString = prop.getProperty("ldapString");
             adminDN = prop.getProperty("adminDN");
-            searchBase = prop.getProperty("searchBase");
-            defaultUserOU = prop.getProperty("defaultUserOU");
-            domainSuffix= prop.getProperty("domainSuffix"); //TODO Create domain suffix dynamically from the baseOU
+            domainSuffix= prop.getProperty("domainSuffix");
+            String temp = domainSuffix.replaceAll("(\\w+)\\.?", "DC\\=$1,");
+            searchBase = temp.substring(0, temp.length() - 1);
+            System.out.println(searchBase);
+            //searchBase = prop.getProperty("searchBase");
+            defaultUserOU = prop.getProperty("defaultUserOU"); //TODO Dynamically add OU to base path??
+            encryptionKey = prop.getProperty("encryptionKey");
 
         }
         catch (Exception e) {
