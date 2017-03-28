@@ -21,3 +21,10 @@ By clicking the like included in the email, the account becomes enabled.
 ## How To Use
 Modify the config.properties to suit your environment and provide a user and password that has permissions to create the users.
 
+You'll also need to modify the SMTP server and email address settings in EmailNotifier.java as well because they're not in a properties file yet.
+
+## Disclaimer
+This is 100% not production ready. 
+
+The fact there is no validation no input fields is probably just the start. 
+This was intended purely as a proof of concept for others to see and implement/modify/reuse.
