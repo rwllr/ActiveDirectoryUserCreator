@@ -1,8 +1,3 @@
-package biz.waller.ad;
-
-import java.util.List;
-
-/*
 MIT License
 
 Copyright (c) 2017 Raphael Waller
@@ -24,22 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-public class Runner {
-/*    protected ADDetails myAD;
-    public void Runner() {
-        myAD.getPhone("raphael@waller.biz");
-    }
-*/
-
-public static void main(String args[]) {
-    String enteredNumber = "447858532173";
-    List<String> phoneList = ADDetails.getPhone("raphael@waller.biz");
-    for (int i=0; i<phoneList.size(); i++) {
-        System.out.println(phoneList.get(i));
-    }
-    if (phoneList.contains(enteredNumber)) {
-        MakeCall.dial(enteredNumber); }
-        };
-    }
-
