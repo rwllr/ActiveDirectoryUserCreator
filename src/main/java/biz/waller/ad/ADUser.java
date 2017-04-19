@@ -29,13 +29,15 @@ public class ADUser {
     private String sName;
     private String[] groupID;
     private String descr;
+    private Boolean exchAcc;
 
-    public ADUser(String[] groups, String fName, String sName, String descr) {
+    public ADUser(String[] groups, String fName, String sName, String descr, Boolean exchAcc) {
         this.groupID = groups;
         this.fName = fName;
         this.sName = sName;
         this.descr = descr;
-        System.out.println(this.fName);
+        this.exchAcc = exchAcc;
+        System.out.println(this.fName+", "+this.exchAcc);
 
     }
     public String getfName() {
@@ -45,6 +47,10 @@ public class ADUser {
     public String getsName() {
         System.out.println(sName);
         return sName;
+    }
+    public Boolean getExchAcc() {
+        System.out.println(exchAcc);
+        return exchAcc;
     }
     public String[] getGroups() {
         return groupID;

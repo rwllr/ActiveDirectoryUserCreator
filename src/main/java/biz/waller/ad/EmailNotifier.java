@@ -65,7 +65,7 @@ public class EmailNotifier {
     }
     public static void sendMessage(ADUser userDetails, String toAddress, String requestUser) {
         Properties properties = System.getProperties();
-        properties.setProperty("mail.smtp.host", "mail.waller.biz"); //TODO Migrate SMTP server to properties file
+        properties.setProperty("mail.smtp.host", ADPropLoader.smtpServer); //TODO Migrate SMTP server to properties file
         Session session = Session.getDefaultInstance(properties);
         try{
             MimeMessage message = new MimeMessage(session);
@@ -78,6 +78,7 @@ public class EmailNotifier {
             sb.append("First name: " + userDetails.getfName()+"\n");
             sb.append("Last name: " + userDetails.getsName()+"\n");
             sb.append("User name: " + samAccountName +"\n");
+            sb.append("Exchange account requested: " + userDetails.getExchAcc() +"\n");
             sb.append("Groups requested: \n");
             String[] str = userDetails.getGroups();
             for (int i=0; i < str.length; i++) {

@@ -38,6 +38,10 @@ public class ADPropLoader
     static String defaultUserOU;
     static String domainSuffix;
     static String encryptionKey;
+    static String HomeMDB;
+    static String msExchHomeServerName;
+    static String authAddress;
+    static String smtpServer;
     static {
         try {
             Properties prop = new Properties();
@@ -64,6 +68,13 @@ public class ADPropLoader
             //searchBase = prop.getProperty("searchBase");
             defaultUserOU = prop.getProperty("defaultUserOU"); //TODO Dynamically add OU to base path??
             encryptionKey = prop.getProperty("encryptionKey");
+            HomeMDB = prop.getProperty("HomeMDB");
+            msExchHomeServerName = prop.getProperty("msExchHomeServerName");
+            authAddress = prop.getProperty("authAddress");
+            smtpServer = prop.getProperty("smtpServer");
+
+
+
 
         }
         catch (Exception e) {

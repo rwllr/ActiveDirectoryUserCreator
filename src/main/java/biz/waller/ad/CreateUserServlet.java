@@ -54,7 +54,8 @@ public class CreateUserServlet extends HttpServlet {
 
         try {
             loginDetails = ADDetails.createUser(newUser);
-            EmailNotifier.sendMessage(newUser, "raphael@waller.biz", request.getRemoteUser());
+            EmailNotifier.sendMessage(newUser, ADPropLoader.authAddress /*//TODO find a better way to dynamically get the auth address for this request depending on factors */,
+                    request.getRemoteUser());
         } catch (NameAlreadyBoundException e) {
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");

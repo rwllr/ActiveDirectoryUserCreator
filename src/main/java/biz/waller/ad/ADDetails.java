@@ -379,6 +379,20 @@ public class ADDetails {
         container.put(password);
         //container.put(logonscript); //TODO Login script not implemented yet
 
+        if (newUser.getExchAcc()) { //If Exchange account requested, set necessary attributes
+            System.out.println("Exchange account requested.");
+        // Exchange account needed attributes
+        Attribute mailNickname = new BasicAttribute("mailNickname", userName);
+        Attribute displayName = new BasicAttribute("displayName", userCN);
+        Attribute HomeMDB = new BasicAttribute("HomeMDB", ADPropLoader.HomeMDB );
+        Attribute msExchHomeServerName = new BasicAttribute("msExchHomeServerName", ADPropLoader.msExchHomeServerName );
+
+        container.put(mailNickname);
+        container.put(displayName);
+        container.put(HomeMDB);
+        container.put(msExchHomeServerName); }
+
+
             LdapContext cnx = getADConnection();
             cnx.createSubcontext(userDN, container);
 

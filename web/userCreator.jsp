@@ -36,8 +36,10 @@ SOFTWARE.
             var fName = $("#fNameField").val();
             var sName = $("#sNameField").val();
             var descr = $("#descrField").val();
+            var exchAcc = $("#exchAccField").prop('checked');
 
-            $.get("createUser", {data: JSON.stringify({groupID: groupdata, fName: fName, sName: sName, descr: descr})},
+
+            $.get("createUser", {data: JSON.stringify({groupID: groupdata, fName: fName, sName: sName, descr: descr, exchAcc: exchAcc})},
                 function (responseData) {
                     $("#statusMessage").empty().append("Username: "+responseData.samAccountName +
                         "<br/>Password :" + responseData.password +
@@ -96,7 +98,8 @@ SOFTWARE.
 
 
     <input id="nameField" type="text"> <- Similar User <br/>
-    <button id="somebutton">press here</button><br/>
+    <input id="exchAccField" type="checkbox"> <- Exchange Account <br/>
+    <button id="somebutton">Search for Similar</button><br/>
 
 
 
